@@ -31,7 +31,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     signOut(auth)
       .then(() => {
         setUser(null);
-        localStorage.removeItem("authToken");
+        localStorage.removeItem("token");
       })
       .catch((error) => {
         console.error("Logout failed: ", error);

@@ -15,6 +15,8 @@ router = APIRouter()
 class Task(BaseModel):
     text: str
 
+
+
 @router.post("/tasks/")
 async def create_task(task: Task, current_user: dict = Depends(get_current_user)):
     try:
@@ -25,6 +27,7 @@ async def create_task(task: Task, current_user: dict = Depends(get_current_user)
             'text': task.text,
             'user_id': user_id
         })
+        print("db.collection('tasks'),",db.collection('tasks'))
         db.collection('tasks').document(task_id).set({
             'id': task_id,
             'text': task.text,

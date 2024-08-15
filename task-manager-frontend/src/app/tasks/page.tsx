@@ -3,6 +3,15 @@
 import React, { useEffect, useState } from "react";
 import TaskItem from "../components/TaskItem/TaskItem";
 import { getTasks, createTask, updateTask, deleteTask, Task } from "./helper";
+import {
+  Typography,
+  Container,
+  Box,
+  TextField,
+  Button,
+  Grid,
+  Paper,
+} from "@mui/material";
 
 const TasksPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -65,36 +74,69 @@ const TasksPage: React.FC = () => {
   }
 
   return (
-    <div>
-      <h1>Tasks</h1>
+    <Container maxWidth="sm">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          textAlign: "center",
+        }}
+      >
+        <Typography variant="h4" component="h1" gutterBottom>
+          Tasks
+        </Typography>
 
-      {/* Form for creating a new task */}
-      <div>
-        <input
-          type="text"
-          value={newTaskText}
-          onChange={(e) => setNewTaskText(e.target.value)}
-          placeholder="Enter new task"
-        />
-        <button onClick={handleCreateTask} disabled={isCreating}>
-          {isCreating ? "Creating..." : "Add Task"}
-        </button>
-      </div>
-
-      {tasks.length === 0 ? (
-        <p>No tasks available</p>
-      ) : (
-        tasks.map((task) => (
-          <TaskItem
-            key={task.id}
-            id={task.id}
-            text={task.text}
-            onEdit={(id) => handleEdit(id, "New Text")} // You might want to get this from an input
-            onDelete={handleDelete}
+        <Box
+          component="form"
+          sx={{
+            display: "flex",
+            gap: "10px",
+            marginBottom: "20px",
+            width: "100%",
+          }}
+        >
+          <TextField
+            fullWidth
+            variant="outlined"
+            value={newTaskText}
+            onChange={(e) => setNewTaskText(e.target.value)}
+            placeholder="Enter new task"
           />
-        ))
-      )}
-    </div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateTask}
+            disabled={isCreating}
+          >
+            {isCreating ? "Creating..." : "Add Task"}
+          </Button>
+        </Box>
+
+        {tasks.length === 0 ? (
+          <Typography variant="body1" color="textSecondary">
+            No tasks available
+          </Typography>
+        ) : (
+          <Grid container spacing={2}>
+            {tasks.map((task) => (
+              <Grid item xs={12} key={task.id}>
+                <Paper elevation={2} sx={{ padding: "10px" }}>
+                  <TaskItem
+                    id={task.id}
+                    text={task.text}
+                    onEdit={(id) => handleEdit(id, "New Text")}
+                    onDelete={handleDelete}
+                  />
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
+    </Container>
   );
 };
 

@@ -2,35 +2,27 @@
 
 import React from "react";
 import { useUser } from "../../context/UserContext";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 
 export function Appbar() {
   const { user, logout } = useUser();
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "10px",
-        background: "#333",
-        color: "#fff",
-      }}
-    >
-      <div>Task Manager</div>
-      {user && (
-        <button
-          onClick={logout}
-          style={{
-            background: "#f00",
-            color: "#fff",
-            padding: "5px 10px",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Logout
-        </button>
-      )}
-    </div>
+    <AppBar position="static">
+      <Toolbar style={{ justifyContent: "space-between" }}>
+        <Typography variant="h6" component="div">
+          Task Manager
+        </Typography>
+        {user && (
+          <Button
+            variant="contained"
+            onClick={logout}
+            style={{ marginLeft: "auto" }}
+          >
+            Logout
+          </Button>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 }
