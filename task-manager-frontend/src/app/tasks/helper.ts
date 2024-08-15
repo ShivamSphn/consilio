@@ -6,7 +6,6 @@ const getAuthToken = () => localStorage.getItem("token");
 
 const authHeaders = () => {
   const token = getAuthToken();
-  console.log("token", token);
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 

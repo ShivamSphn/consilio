@@ -19,24 +19,6 @@ import {
 import { Google as GoogleIcon } from "@mui/icons-material";
 import { jwtDecode } from "jwt-decode";
 
-const checkTokenValidity = async (token: any) => {
-  try {
-    const decodedToken = jwtDecode(token);
-    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-    const exp = decodedToken.exp; // Token expiration time
-    // @ts-ignore
-    if (exp < currentTime) {
-      console.log("Token expired, refreshing...");
-      return await auth?.currentUser?.getIdToken(true); // Force refresh
-    } else {
-      console.log("Token is valid");
-      return token;
-    }
-  } catch (error) {
-    console.error("Error decoding token:", error);
-  }
-};
-
 const LoginPage: React.FC = () => {
   const router = useRouter();
 
@@ -54,9 +36,6 @@ const LoginPage: React.FC = () => {
     try {
       const result: UserCredential = await signInWithPopup(auth, provider);
       const token = await result.user.getIdToken();
-      const decodedToken = jwtDecode(token);
-      checkTokenValidity(token);
-      console.log("decodedToken", decodedToken);
       localStorage.setItem("token", token);
       router.push("/tasks");
     } catch (error) {
