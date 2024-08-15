@@ -7,7 +7,6 @@ import uuid
 from pydantic import BaseModel
 import warnings
 
-# Suppress specific warning
 warnings.filterwarnings("ignore", message="Detected filter using positional arguments")
 
 router = APIRouter()
@@ -22,6 +21,7 @@ async def create_task(task: Task, current_user: dict = Depends(get_current_user)
     try:
         task_id = str(uuid.uuid4())
         user_id = current_user['uid']
+        print("user_id",user_id)
         db.collection('tasks').document(task_id).set({
             'id': task_id,
             'text': task.text,
