@@ -1,0 +1,18 @@
+# .gitignore
+service-account.json
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Service account credentials
+service-account.json
+
+# Logs
+logs/
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
