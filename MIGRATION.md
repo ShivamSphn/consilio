@@ -22,7 +22,45 @@ cp .env.sample .env
      `task-manager-backend/app/service-account.json`
    - Verify the path matches FIREBASE_SERVICE_ACCOUNT_PATH in .env
 
-## 2. Database Schema Migration
+## 2. Docker Setup
+
+### Prerequisites
+- Docker Engine 20.10.0 or later
+- Docker Compose v2.0.0 or later
+
+### Running with Docker Compose
+
+1. Build and start the containers:
+```bash
+docker compose up --build
+```
+
+2. Services will be available at:
+   - Frontend: http://localhost:3000
+   - Backend: http://localhost:8000
+   - API Docs: http://localhost:8000/api/docs
+
+### Container Configuration
+
+The setup includes:
+- Backend container (FastAPI)
+  - Python 3.11 base image
+  - Non-root user for security
+  - Health checks
+  - Volume mounts for logs and Firebase credentials
+
+- Frontend container (Next.js)
+  - Node 18 base image
+  - Multi-stage build for optimization
+  - Non-root user for security
+  - Health checks
+  - Automatic backend service discovery
+
+### Volume Mounts
+- Firebase service account: `./task-manager-backend/app/service-account.json:/app/service-account.json:ro`
+- Application logs: `./logs:/app/logs`
+
+## 3. Database Schema Migration
 
 New fields added to the tasks collection:
 - `completed` (boolean)
@@ -44,7 +82,7 @@ The migration script will:
 - Set default values (completed = false, created_at = current time)
 - Use batch updates to ensure atomic operations
 
-## 3. Frontend Dependencies Update
+## 4. Frontend Dependencies Update
 
 Updated dependencies include:
 - Material-UI components and icons
@@ -72,36 +110,40 @@ npm run lint
    - Confirm all required variables are set
    - Check Firebase service account file location
 
-2. Run database migration
-3. Update frontend dependencies
-4. Start the services:
-   ```bash
-   # Backend
-   cd task-manager-backend
-   uvicorn app.main:app --reload
+2. Docker Verification:
+   - Check container logs: `docker compose logs`
+   - Verify health checks: `docker compose ps`
+   - Test service connectivity
+   - Monitor resource usage: `docker stats`
 
-   # Frontend
-   cd task-manager-frontend
-   npm run dev
-   ```
-5. Test new features:
-   - Task completion toggle
-   - Creation/update timestamps
-   - Enhanced error handling
-   - Loading states
+3. Application Testing:
+   - Test task completion toggle
+   - Verify timestamps
+   - Check error handling
+   - Test loading states
 
 ## Rollback Plan
 
-If issues occur:
+1. Docker Rollback:
+   ```bash
+   # Stop containers
+   docker compose down
 
-1. Environment: 
+   # Remove volumes if needed
+   docker compose down -v
+
+   # Revert to previous images
+   docker compose up --build
+   ```
+
+2. Environment: 
    - Keep backup of old .env files before updating
    - Restore from backup if needed
 
-2. Database: 
+3. Database: 
    - Previous data structure remains intact
    - New fields can be safely removed
 
-3. Frontend: 
+4. Frontend: 
    - Package.json includes exact versions for safe rollback
    - Use `npm install` with previous package.json if needed

@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./task-manager-backend
+      dockerfile: Dockerfile
+    container_name: task-manager-backend
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - ENV=production
+      - ALLOWED_ORIGINS=http://localhost:3000
+      - FIREBASE_SERVICE_ACCOUNT_PATH=/app/service-account.json
+      - FIREBASE_DATABASE_URL=https://your-project.firebaseio.com
+      - FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+      - FIREBASE_PROJECT_ID=your-project-id
+      - AUTH_ENABLED=true
+      - TOKEN_EXPIRE_MINUTES=60
+      - JWT_ALGORITHM=RS256
+      - LOG_LEVEL=INFO
+      - LOG_FILE=/app/logs/app.log
+      - MAX_LOG_SIZE_MB=1
+      - LOG_BACKUP_COUNT=5
+      - RATE_LIMIT_PER_MINUTE=100
+      - MAX_TASK_LENGTH=500
+      - MAX_TASKS_PER_USER=100
+      - ENABLE_DOCS=false
+      - DEBUG=false
+    volumes:
+      - ./task-manager-backend/app/service-account.json:/app/service-account.json:ro
+      - ./logs:/app/logs
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - task-manager-network
+
+  frontend:
+    build:
+      context: ./task-manager-frontend
+      dockerfile: Dockerfile
+    container_name: task-manager-frontend
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:8000/api
+      - NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+      - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+      - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+      - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+      - NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+      - NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your-measurement-id
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - task-manager-network
+
+networks:
+  task-manager-network:
+    driver: bridge
+
+volumes:
+  logs:
+    driver: local
